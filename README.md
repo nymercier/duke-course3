@@ -11,3 +11,5 @@ After completing this course, you will be able to:
 4. Store and manipulate data in an array or ArrayList;
 5. Combine multiple classes to solve larger problems;
 6. Use iterables and collections (including maps) in Java.
+
+https://www.coursera.org/learn/java-programming-arrays-lists-data?specialization=java-programming
