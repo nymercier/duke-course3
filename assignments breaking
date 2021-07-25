@@ -31,6 +31,7 @@ public class WordLengths {
     }
     
     public int indexOf(String[] list, String word) {
+    
         // takes a list of words in a word, to look the word, and indicates the location
         for (int k=0; k<list.length; k++) {
             if (list[k].equals(word)) {
