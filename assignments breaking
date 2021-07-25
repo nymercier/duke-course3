@@ -1,0 +1,91 @@
+
+/**
+ * Write a description of WordLengths here.
+ */
+
+import java.util.Random;
+import edu.duke.*;
+import org.apache.commons.csv.*;
+import java.io.*;
+
+public class WordLengths {
+    
+    public String[] getsmall() {
+    
+        //date file, common.txt
+        // 20 commons words, 20 string arrays
+        
+        FileResource resource = new FileResource("data/small.txt");
+        String[] small = new String[20];
+        
+        // as to know the actual size
+        
+        int index = 0;
+        for(String s : resource.words()){
+            small[index] = s;
+            index += 1;
+        }
+        System.out.println("test getsmall "+small);
+        return small;
+        
+    }
+    
+    public int indexOf(String[] list, String word) {
+        // takes a list of words in a word, to look the word, and indicates the location
+        for (int k=0; k<list.length; k++) {
+            if (list[k].equals(word)) {
+                   return k;
+            }
+        }
+        return -1;
+        // didnt find it
+    }
+    
+    public void countWordLengths (FileResource resource, int[] counts) {
+           
+        for (String word : resource.words()) {
+            int wordlength = word.length();
+            
+            if (Character.isLetter(word.charAt(wordlength-1)) == false) {
+                wordlength--;
+            }
+            if (wordlength >= counts.length) {
+                wordlength = counts.length -1;
+            }
+            if (wordlength > 0) {
+                counts[wordlength]++;
+            }
+        }
+    }   
+
+    
+    public void testcountWordLengths () {
+       String[] plays = {"small.txt"};
+       
+       int[] counts = new int[31];
+       for(int k=0; k < plays.length; k++){
+            FileResource resource = new FileResource();
+            countWordLengths(resource,counts);
+            //System.out.println("done with " + plays[k]);
+            
+            int maxDex = maxIndex(counts);
+            System.out.println("the index position of the largest element in values "+maxDex);
+            //System.out.println(small[k]+counts[k]);
+       }
+       
+       for (int k=1; k< counts.length; k++) {
+           System.out.println(counts[k]+" words of length " +k);           
+       }
+       // int k=1 car la longueur doit être de 1 min pour longueur d'un mot
+    }    
+    
+    public int maxIndex (int [] vals) {
+        int maxDex =0;
+        for (int k=0; k<vals.length; k++) {
+            if (vals[k] > vals[maxDex]) {
+                maxDex=k;
+            }
+        }
+        return maxDex;
+    }
+}
