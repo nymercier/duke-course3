@@ -1,0 +1,115 @@
+import edu.duke.*;
+import java.util.*;
+import java.io.*;
+
+public class WordsInFiles {
+    
+    private ArrayList<String> words;
+    private HashMap<String,ArrayList<String>> mapwordsfile;
+    private HashMap<String,ArrayList<String>> addwords;
+            
+    public WordsInFiles() {
+        words = new ArrayList<String>();
+        mapwordsfile = new HashMap<String,ArrayList<String>>();
+        addwords = new HashMap<String,ArrayList<String>>();
+    }
+    
+    private void addWordsFromFile (File f) {
+        FileResource fr = new FileResource(f);
+        
+        
+        for(String w : fr.words()){
+            w = w.toLowerCase();
+            String name = f.getName();
+
+            if (!addwords.containsKey(w)){
+                ArrayList<String> nomfichier2 = new ArrayList<String>();
+                nomfichier2.add(name);
+                addwords.put(w,nomfichier2);
+            }
+            else if (addwords.containsKey(w) && !addwords.get(w).contains(name)) {
+                ArrayList<String> list = addwords.get(w);
+                list.add(name);
+                addwords.put(w,list);
+ 
+                }
+            }
+    }
+    
+    private ArrayList<String> wordsInNumFiles (int number) {
+        
+        //returns an ArrayList of words that appear in exactly number files
+        ArrayList<String> wordList = new ArrayList<String>();
+        
+        for (String word : addwords.keySet()) {
+            ArrayList<String> currentList = addwords.get(word);
+            int currentFileCount = currentList.size();
+            if (currentFileCount == number) {
+                wordList.add(word);
+            }
+        }
+        return wordList;
+    }
+    
+    public void buildWordFileMap () {
+        
+        addwords.clear();
+        
+        ArrayList<String> nomfichiermotrecherché = new ArrayList<String>();
+        ArrayList<String> nomfichier = new ArrayList<String>();
+        
+        DirectoryResource dr = new DirectoryResource();
+        
+        for (File f : dr.selectedFiles()) {
+            FileResource fr = new FileResource(f);
+            addWordsFromFile(f);
+            String name = f.getName();
+            String word = "sea";
+            for (String mot : fr.words()){               
+                if (! nomfichier.contains(name)) {
+                    nomfichier.add(name);
+                }
+                mapwordsfile.put(mot,nomfichier);
+                if (mot.equals(word) == true) {
+                    System.out.println("mot recherché est "+word);
+                    nomfichiermotrecherché.add(name);
+                }
+            }
+        }
+        
+        for (String s : nomfichiermotrecherché) {
+            System.out.println("nomfichier du mot est "+s);
+        } 
+        
+        for (String s : addwords.keySet()) {
+            System.out.println(s+"\t"+addwords.get(s));
+        }     
+        
+        int nbdemotsdanswords = words.size();
+        System.out.println("test"+nbdemotsdanswords);
+    }
+    
+   
+    public void testeradd () {
+        DirectoryResource dr = new DirectoryResource();
+        for (File f : dr.selectedFiles()) {
+            FileResource fr = new FileResource(f);
+            addWordsFromFile(f);
+        }
+        for (String s : addwords.keySet()) {
+             System.out.println(s+"\t"+addwords.get(s));
+        }
+        words = wordsInNumFiles(2);
+        System.out.println("Total words in files: " + words);
+    }
+    
+    public void tester () {
+        DirectoryResource dr = new DirectoryResource();
+        for (File f : dr.selectedFiles()) {
+            FileResource fr = new FileResource(f);
+            buildWordFileMap();
+            
+        }
+    }
+}
+
