@@ -1,0 +1,82 @@
+import edu.duke.*;
+import java.util.*;
+
+public class CharactersInPlay {
+    
+    private ArrayList<String> myNamesCharacter;
+    private ArrayList<Integer> myFreqs;
+    
+    public CharactersInPlay () {
+        myNamesCharacter = new ArrayList<String>();
+        myFreqs = new ArrayList<Integer>();
+    }
+    
+    public void update (String person) {
+
+        person = person.toLowerCase();
+        int index = myNamesCharacter.indexOf(person);
+        if (index == -1){
+            //first occurence
+            myNamesCharacter.add(person);
+            myFreqs.add(1);
+        }
+        else {
+            //see before so you can get the index
+            //find the value and set the value
+            int freq = myFreqs.get(index);
+            myFreqs.set(index,freq+1);
+        }
+        
+    }
+    
+    public void findAllCharacters () {
+        
+        FileResource resource = new FileResource();
+        for(String line : resource.lines()) {
+                String person ="";
+                if (line.indexOf(".") != -1) {
+                    line = line.toLowerCase();
+                    person = line.substring(0, line.indexOf("."));
+                    update(person);
+                }
+        }
+    }
+    
+    public void tester() {
+        myNamesCharacter.clear();
+        myFreqs.clear();
+        FileResource resource = new FileResource();
+        findAllCharacters();
+        for (int k=0; k < myNamesCharacter.size(); k++) {
+            if (myFreqs.get(k)>1) {
+                System.out.println("nom de mes personnages est:"+myNamesCharacter.get(k));
+            }
+        }
+
+        int index = findMax();
+        System.out.println("max word et sa frequence: "+myNamesCharacter.get(index)+" "+myFreqs.get(index));
+        System.out.println("Total des noms : "+myNamesCharacter.size());       
+        charactersWithNumParts (10,15);
+    }
+    
+    public int findMax(){
+        int max = myFreqs.get(0);
+        int maxIndex = 0;
+        for(int k=0; k < myFreqs.size(); k++){
+            if (myFreqs.get(k) > max){
+                max = myFreqs.get(k);
+                maxIndex = k;
+            }
+        }
+        return maxIndex;
+    }
+    
+    public void charactersWithNumParts (int num1, int num2) {
+    
+        for (int k=0; k < myNamesCharacter.size(); k++) {
+            if (myFreqs.get(k)>= num1 && myFreqs.get(k)<=num2) {
+                System.out.println("nom avec chiffre:"+myNamesCharacter.get(k));
+            }
+        }
+    }
+}
