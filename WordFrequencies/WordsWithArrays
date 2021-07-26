@@ -1,0 +1,68 @@
+import java.util.*;
+import edu.duke.*;
+
+public class WordsWithArrays {
+    
+    StorageResource myWords;
+    
+    public WordsWithArrays() {
+        myWords = new StorageResource();
+    }
+    
+    public void readWords(){
+        myWords.clear();
+        FileResource resource = new FileResource();
+        for(String word : resource.words()){
+            myWords.add(word.toLowerCase());
+        }
+    }
+    
+    public boolean contains(String[] list, String word, int numStored){
+        for(int k=0; k < numStored; k++){
+            if (list[k].equals(word)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // null to a string ; if k < list.length (list is null); compare to nothing
+    //without the "numStored"
+    //So what contains is gonna do is it's going to look through the array and see 
+    //if the word that we're passing in matches anything, and if it does, it returns true.
+    //If we go through the whole thing and we don't see it anywhere, we're gonna return false.
+    
+    public int numberOfUniquewords () {
+        int numStored = 0;
+        String [] words = new String [myWords.size()];
+        //size() i dont know, big as StorageResource
+        for (String s : myWords.data()) {
+            if (! contains (words,s, numStored)) {
+                words[numStored] = s;
+                numStored++;
+            }
+        }
+        return numStored;
+    }
+    
+    public int countDifferentArray(){
+        int numStored = 0;
+        String[] words = new String[myWords.size()];
+        for(String s : myWords.data()){
+             if (! contains(words,s, numStored)){
+                 words[numStored] = s;
+                 numStored++;
+             }
+        }
+        return numStored;
+    }
+    
+    public void tester(){
+        readWords();
+        System.out.println("number of words read: "+myWords.size());
+        int unique = countDifferentArray();
+        System.out.println("array count "+unique);
+    }
+    
+
+}
