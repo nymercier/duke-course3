@@ -1,0 +1,57 @@
+import edu.duke.*;
+import java.util.*;
+
+public class CodonCount {
+    
+    //Create a private variable to store a HashMap to map DNA codons to their count.
+    private HashMap<String,Integer> map;
+    
+    //Write a constructor to initialize the HashMap variable.
+    public CodonCount2(){
+        map = new HashMap<String,Integer>();
+    }
+    
+    public void buildCodonMap (int start, String dna) {
+    
+        FileResource fr = new FileResource(dna);
+        
+        for(String w : fr.words()){
+            w = w.toLowerCase();
+            w = w.substring(start);
+            
+            for(int i = 0; i < w.length(); i+=3) {
+                if ((i+3) < w.length()) {
+                    String codon = w.substring(i,i+3);
+                    if (!map.containsKey(codon)){
+                        map.put(codon,1);
+                    }
+                    else {
+                        map.put(codon,map.get(codon)+1);
+                    }
+                }
+            }
+  
+        }
+        
+        int total = 0;
+        
+        for(String w : map.keySet()){
+            int value = map.get(w);
+            //seen w before?
+            //if (value > 200){
+            //    System.out.println(value+"\t"+w);
+            //}
+            total += value;
+        }
+        System.out.println("total count: "+total+" different = "+map.keySet().size());
+        
+        for (String s : map.keySet()) {
+            System.out.println("différents codons sont: "+s+"\t"+"nb de fois: "+map.get(s));
+        }
+    }
+
+    public void tester () {
+        String filename = "data/dnaMystery2.txt";
+        buildCodonMap(0,filename);
+    }
+}
