@@ -15,8 +15,7 @@ public class WordsInFiles {
     }
     
     private void addWordsFromFile (File f) {
-        FileResource fr = new FileResource(f);
-        
+        FileResource fr = new FileResource(f);       
         
         for(String w : fr.words()){
             w = w.toLowerCase();
@@ -88,7 +87,6 @@ public class WordsInFiles {
         int nbdemotsdanswords = words.size();
         System.out.println("test"+nbdemotsdanswords);
     }
-    
    
     public void testeradd () {
         DirectoryResource dr = new DirectoryResource();
