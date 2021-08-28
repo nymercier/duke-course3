@@ -7,7 +7,9 @@
  */
 
 import  java.util.*;
+
 public class LogEntry {
+    //5 fields
      private String ipAddress;
      private Date accessTime;
      private String request;
@@ -15,17 +17,18 @@ public class LogEntry {
      private int bytesReturned;
      
    public LogEntry(String ip, Date time, String req, int status, int bytes) {
+       //constructor info pass in
        ipAddress = ip;
        accessTime = time;
        request = req;
        statusCode = status;
        bytesReturned = bytes;
-       
    }
    
+   //all the methods
    public String getIpAddress() {
          return ipAddress;
-    }
+   }
     public Date getAccessTime() {
          return accessTime;
    }   
@@ -42,7 +45,5 @@ public class LogEntry {
    public String toString() {
        return ipAddress + " " + accessTime + " " + request 
            + " " + statusCode + " " + bytesReturned;
-    }
-    
+   }
 }
-
