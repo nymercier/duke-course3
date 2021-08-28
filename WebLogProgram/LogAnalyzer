@@ -1,0 +1,236 @@
+
+/**
+ * Write a description of class LogAnalyzer here.
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+
+import java.util.*;
+import edu.duke.*;
+import java.io.*;
+
+public class LogAnalyzer {
+    
+     private ArrayList<LogEntry> records;
+     //private HashMap<String,Integer> counts;
+     
+     public LogAnalyzer() {
+         records = new ArrayList<LogEntry> ();
+         //counts = new HashMap<String,Integer> ();
+     }
+     
+     public int countIPs () {
+         int nbdeips = records.size();
+         return nbdeips;
+     }
+             
+     public void readFile(String filename) {
+         FileResource resource = new FileResource(filename);
+         for (String line: resource.lines()) {
+             LogEntry le = WebLogParser.parseEntry(line);
+             records.add(le);
+             //System.out.println("test "+WebLogParser.parseEntry(line));
+         }
+         int nb = countIPs();
+         //System.out.println(nb);
+     }
+        
+     public int countUniqueIPs() {
+         ArrayList<String> IPs = new ArrayList<String> ();
+         for (LogEntry le : records) {
+             String ipAddr = le.getIpAddress();
+             if (! IPs.contains(ipAddr) == true) {
+                 IPs.add(ipAddr);
+             }
+        }
+        return IPs.size();
+     }
+     
+     public void printAll() {
+         FileResource resource = new FileResource();
+         for (LogEntry le : records) {
+             System.out.println(le);
+         }
+     }
+     
+     public void printAllHigherThanNum (int num) {
+         ArrayList<LogEntry> logEntry = new ArrayList<LogEntry> ();
+         ArrayList<Integer> code = new ArrayList<Integer> ();
+         for (LogEntry le : records) {
+             int statuscode = le.getStatusCode();
+             if (statuscode > num) {
+                 String ipAddr = le.getIpAddress();
+                 if (!code.contains(statuscode)) {
+                        //System.out.println(ipAddr);
+                        code.add(statuscode);
+                        logEntry.add(le);
+                        System.out.println("only statuscode + "+ code + logEntry);
+                 }
+             }
+         }
+     }  
+     
+     
+     public ArrayList<String> uniqueIPVisitsOnDay (String someday) {
+         ArrayList<String> uniqueIPVisitsOnDay = new ArrayList<String>();
+         for (LogEntry le : records) {
+             String date = le.getAccessTime().toString();
+             date = date.substring(4,10);
+             //System.out.println(date);
+             //String ipAddr = le.getIpAddress();
+             //String ipAddrdate = date+ipAddr;
+             //ipAddrdate = ipAddrdate.toString();
+             if (date.equals(someday)){
+                    //System.out.println(ipAddrdate);
+                    //uniqueIPVisitsOnDay.add(le);
+                    String ipAddr = le.getIpAddress();
+                    if (!uniqueIPVisitsOnDay.contains(ipAddr)) {
+                        //System.out.println(ipAddr);
+                        uniqueIPVisitsOnDay.add(ipAddr);
+                    }
+             }
+         }
+         int numuniqueIPVisitsOnDay = uniqueIPVisitsOnDay.size();
+         //System.out.println("numuniqueIPVisitsOnDay "+numuniqueIPVisitsOnDay);
+         return uniqueIPVisitsOnDay;
+     }
+     
+     public int countUniqueIPsInRange (int low, int high) {
+         ArrayList<String> UniqueIPsInRange = new ArrayList<String>();
+         for (LogEntry le : records) {
+             int statuscode = le.getStatusCode();
+             System.out.println(statuscode);
+             if (statuscode >= low && statuscode <= high) {
+                 String ipAddr = le.getIpAddress();
+                 //System.out.println(ipAddr);
+                 if (!UniqueIPsInRange.contains(ipAddr)) {
+                     UniqueIPsInRange.add(ipAddr);
+                 }
+             }
+         }
+         int nbcountUniqueIPsInRange = UniqueIPsInRange.size();
+         return nbcountUniqueIPsInRange;
+     }
+     
+     public HashMap<String,Integer> countVisitsPerIP () {
+         HashMap<String,Integer> counts = new HashMap<String,Integer>();
+         for (LogEntry le : records) {
+            String ipAddr = le.getIpAddress();
+            if (!counts.containsKey(ipAddr)) {
+                counts.put (ipAddr,1);
+            }
+            else {
+                counts.put(ipAddr,counts.get(ipAddr)+1);
+            }
+         }
+         return counts;
+     }
+     
+     public int countshowmany () {
+         HashMap<String,Integer> counts = countVisitsPerIP();
+         return counts.size();
+     }
+     
+     public int mostNumberVisitsByIP (HashMap<String,Integer> counts) {
+        int max = 0;
+        //HashMap<String,Integer> counts = countVisitsPerIP();
+        //System.out.println("int test "+counts);
+        for (String s : counts.keySet ()) {
+            int curr = counts.get(s);
+            //System.out.println(s+" "+curr);
+            if (curr > max) {
+                max = curr;
+                //System.out.println("max"+max);
+            }
+        }
+        return max;
+     }
+     
+     public ArrayList<String> iPsMostVisits (HashMap<String,Integer> counts) {
+         counts = countVisitsPerIP();
+         int max = mostNumberVisitsByIP(counts);
+         ArrayList<String> IPsInMaxvisit = new ArrayList<String>();
+         for (String s : counts.keySet()) {
+             if (counts.get(s) == max) {
+                 IPsInMaxvisit.add(s);
+                 System.out.println(IPsInMaxvisit);
+             }
+         }
+         return IPsInMaxvisit;
+     }
+     
+     public HashMap<String, ArrayList<String>> iPsForDays() {
+        HashMap<String, ArrayList<String>> list = new HashMap<String, ArrayList<String>>();
+        //ArrayList<String> IPsInThatDay = new ArrayList<String>();
+        for (LogEntry le : records) {
+             String date = le.getAccessTime().toString();
+             date = date.substring(4,10);
+             String ipAddr = le.getIpAddress();
+             //IPsInThatDay.add(ipAddr);
+             //list.put(date,IPsInThatDay);
+             if (!list.containsKey(date)) { 
+                 //IPsInThatDay.add(ipAddr);
+                 ArrayList<String> IPsInThatDay = new ArrayList<String>();
+                 IPsInThatDay.add(ipAddr);
+                 list.put(date,IPsInThatDay);
+             }    
+             else {
+                 //ArrayList<String> IPsInThatDay = list.get(date);
+                 list.get(date).add(ipAddr);
+                 //IPsInThatDay.add(ipAddr);
+                 //list.put(date,IPsInThatDay);
+             }
+        }
+        return list;
+     }
+     
+     public String dayWithMostIPVisits (HashMap<String, ArrayList<String>> list) {
+         list = iPsForDays();
+         System.out.println(list);
+         int max = 0;
+         String name = null;
+         for (String s : list.keySet()) {
+             int nbpararray = list.get(s).size(); 
+             System.out.println("ip "+s+"\t"+nbpararray);
+             if (nbpararray > max) {
+                 max = nbpararray;
+                 name = s;
+                 //System.out.println("ip "+s+"\t"+nbpararray);
+                 //System.out.println(name);
+             }
+         }
+         return name;
+     }
+     
+     public ArrayList<String> iPsWithMostVisitsOnDay (HashMap<String, ArrayList<String>> list, String date) {
+         ArrayList<String> iPsOnDay = new ArrayList<String>();
+         iPsOnDay = list.get(date);
+         //System.out.println("test1 "+iPsOnDay);
+         HashMap<String, Integer> map = new HashMap<String, Integer>();
+         for (String s : iPsOnDay) {
+             if (! map.containsKey(s)) {
+                 map.put(s,1);
+             }
+             else {
+                 map.put(s,(map.get(s)+1));
+             }
+         }
+         System.out.println("test"+map);
+         ArrayList<String> réponse = iPsMostVisits(map);
+                 
+         int réponse2 = mostNumberVisitsByIP(map);
+         System.out.println(réponse2);
+                 
+         ArrayList<String> IPsInMaxvisit = new ArrayList<String>();
+         for (String s : map.keySet()) {
+             if (map.get(s) == réponse2) {
+                 IPsInMaxvisit.add(s);
+                 System.out.println(IPsInMaxvisit);
+             }
+         }
+         return IPsInMaxvisit;
+     }
+                 
+}
+
