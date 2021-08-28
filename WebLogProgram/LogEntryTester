@@ -1,14 +1,106 @@
+
+/**
+ * Write a description of class Tester here.
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+
 import java.util.*;
+import edu.duke.*;
 
 public class Tester {
+    
     public void testLogEntry() {
         LogEntry le = new LogEntry("1.2.3.4", new Date(), "example request", 200, 500);
         System.out.println(le);
+        //le.getLogInfo();
         LogEntry le2 = new LogEntry("1.2.100.4", new Date(), "example request 2", 300, 400);
         System.out.println(le2);
     }
     
+    public void testUniqueIP () {
+        LogAnalyzer LA = new LogAnalyzer();
+        LA.readFile("weblog2_log.txt");
+        LA.printAll();
+        int nbunique = LA.countUniqueIPs();
+        System.out.println("nombre d'entrées uniques records : "+nbunique);
+    }
+    
     public void testLogAnalyzer() {
-        // complete method
+        LogAnalyzer LA = new LogAnalyzer();
+        LA.readFile("weblog2_log.txt");
+        LA.printAll();
+        int nb = LA.countIPs();
+        System.out.println("nombre d'entrées dans records : "+nb);
+    }
+    
+    public void testprintAllHigherThanNum() {
+        LogAnalyzer LA = new LogAnalyzer();
+        LA.readFile("weblog2_log.txt");
+        //LA.printAll();
+        LA.printAllHigherThanNum(400);
+        //System.out.println("nombre d'entrées dans records : "+le);
+    }
+    
+    public void testuniqueIPVisitsOnDay() {
+        LogAnalyzer LA = new LogAnalyzer();
+        LA.readFile("weblog2_log.txt");
+        //LA.printAll();
+        LA.uniqueIPVisitsOnDay("Sep 27");
+        System.out.println("nombre d'entrées dans records :"+ LA.uniqueIPVisitsOnDay("Sep 27"));
+    }
+    
+    public void testcountUniqueIPsInRange() {
+        LogAnalyzer LA = new LogAnalyzer();
+        LA.readFile("weblog2_log.txt");
+        //LA.printAll();
+        int nbuniqueinrange = LA.countUniqueIPsInRange(400,499);
+        System.out.println("nombre d'entrées dans nbuniqueinrange : " +nbuniqueinrange);
+    }
+    
+    public void testcountVisitsPerIP () {
+        LogAnalyzer LA = new LogAnalyzer();
+        LA.readFile("weblog2_log.txt");
+        System.out.println(LA.countVisitsPerIP());
+        //int max = LA.mostNumberVisitsByIP(LA.countVisitsPerIP());
+        //System.out.println(max);
+        int nb = LA.countshowmany();
+        System.out.println("combien de unique ip"+"\t"+nb);
+    }
+    
+    public void testmostNumberVisitsByIP () {
+        LogAnalyzer LA = new LogAnalyzer();
+        LA.readFile("weblog2_log.txt");
+        //System.out.println("test "+LA.countVisitsPerIP());
+        int max = LA.mostNumberVisitsByIP(LA.countVisitsPerIP());
+        System.out.println("mostNumberVisitsByIP "+max);
+    }
+    
+    public void testiPsMostVisits () {
+        LogAnalyzer LA = new LogAnalyzer();
+        LA.readFile("weblog2_log.txt");
+        System.out.println(LA.iPsMostVisits(LA.countVisitsPerIP()));
+    }
+    
+    public void testiPsForDays () {
+        LogAnalyzer LA = new LogAnalyzer();
+        LA.readFile("weblog2_log.txt");
+        System.out.println(LA.iPsForDays());
+    }
+    
+    public void testdayWithMostIPVisits() {
+        LogAnalyzer LA = new LogAnalyzer();
+        LA.readFile("weblog2_log.txt");
+        String max = LA.dayWithMostIPVisits(LA.iPsForDays());
+        System.out.println("dayWithMostIPVisits "+max);
+    }
+    
+    public void testiPsWithMostVisitsOnDay() {
+        LogAnalyzer LA = new LogAnalyzer();
+        LA.readFile("weblog2_log.txt");
+        //String dayWithMostIPVisits = LA.dayWithMostIPVisits(LA.iPsForDays());
+        ArrayList<String> liste = LA.iPsWithMostVisitsOnDay(LA.iPsForDays(), "Sep 29");
+        System.out.println("iPsWithMostVisitsOnDay "+liste);
     }
 }
