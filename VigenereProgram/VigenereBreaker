@@ -1,0 +1,282 @@
+import java.util.*;
+import edu.duke.*;
+import java.io.*;
+import java.util.Arrays;
+
+public class VigenereBreaker {
+    
+    public String sliceString(String message, int whichSlice, int totalSlices) {
+        StringBuilder encrypted = new StringBuilder(message.toLowerCase());
+        String sliceString = "";
+        for (int i = whichSlice; i<encrypted.length(); i+=totalSlices) {
+            char currChar = encrypted.charAt(i);
+            //encrypted.setCharAt(i, currChar);
+            sliceString = sliceString + currChar;
+            //System.out.println(currChar);
+        }
+        //return encrypted.toString();
+        return sliceString;
+    }
+
+    public int[] tryKeyLength(String encrypted, int klength, char mostCommon) {
+        //String messageencrypt = sliceString(encrypted, 5, 'e');
+        int[] plusieursclés = new int[klength];
+        for (int i = 0; i < klength; i++) {
+            //int[] key = new int[klength];
+            String msg = sliceString(encrypted,i,klength);
+            //System.out.println("test "+"\t"+msg);
+            CaesarCracker CCrack = new CaesarCracker(mostCommon);
+            int key1 = CCrack.getKey(msg);
+            plusieursclés[i] = key1;
+        }
+        return plusieursclés;
+    }
+    
+    public void testslice() {
+        String réponse = sliceString ("abcdefghijklm", 3, 5);
+        System.out.println("La réponse : "+réponse);
+        String réponse2 = sliceString ("abcdefghijklm", 3, 4);
+        System.out.println("La réponse : "+réponse2);
+    }
+    
+    public void testkeys () {
+        FileResource resource = new FileResource();
+        String message = resource.asString();
+        int [] clé = tryKeyLength(message, 38 ,'e');
+        //System.out.println(clé);
+        System.out.println("clés sont : "+"\t"+Arrays.toString(clé));
+    }
+    
+    public void breakVigenere () {
+        //VigenereCipher VCipher = new VigenereCipher();
+        FileResource resource = new FileResource();
+        String message = resource.asString();
+        int [] clé = tryKeyLength(message, 4 ,'e');
+        //System.out.println(clé);
+        //System.out.println("clés sont : "+"\t"+Arrays.toString(clé));
+        int [] myList = clé;
+        VigenereCipher VCipher = new VigenereCipher(myList);
+        String réponse = VCipher.decrypt(message);
+        System.out.println("Mon texte : "+réponse);
+    }
+    
+    //up to 100
+    
+    public HashSet<String> ReadDictionary (FileResource fr) {
+       //fr = new FileResource("dictionaries/English.txt");
+       //fr = new FileResource();
+       HashSet<String> dictionaries = new HashSet<String>();
+       for (String line : fr.lines()) {
+           dictionaries.add(line.toLowerCase());
+       }
+       return dictionaries;
+    }
+    
+    public void testReadDictionary () {
+        FileResource fr = new FileResource();
+        HashSet<String> dictionaries = ReadDictionary(fr);
+        System.out.println("testdictionnaire "+dictionaries);
+    }
+    
+    public char mostCommonCharIn (HashSet<String> dictionary) {
+        HashMap<Character, Integer> map = new HashMap<Character, Integer>();
+        for (String words : dictionary) {
+            //System.out.println("words "+words);
+            for (int k=0; k < words.length(); k++) {
+                char ch = Character.toLowerCase(words.charAt(k));
+                //ch = ch.asString();
+                //System.out.println("ch "+ch);
+                if (!map.containsKey(ch)){
+                    map.put(ch,1);
+                }
+                else {
+                    map.put(ch,(map.get(ch)+1));
+                }
+            }
+        }
+        char maxKey = 'd';
+        //je dois remplir la valeur de maxKey?
+        int maxValue = 0;
+        for (Character s : map.keySet()) {
+            //System.out.println("clés sont : "+ s + " valeur " + map.get(s));
+            int currentValue = map.get(s);
+            if (currentValue > maxValue) {
+                maxValue = currentValue;
+                maxKey = s;
+            }
+        }
+        //System.out.println("max ch : "+ maxKey + "max de fois : "+ maxValue);
+        return maxKey;
+    }
+    
+    public void testmostCommonCharIn () {
+        FileResource fr = new FileResource();
+        HashSet<String> dictionaries = ReadDictionary(fr);
+        //HashSet<String> dictionaries = new HashSet<String>();
+        //dictionaries.add("allo");
+        //dictionaries.add("yo O");        
+        char pluscommon = mostCommonCharIn(dictionaries);
+        System.out.println("testmostcommonchar "+pluscommon);
+    }
+    
+    public int countWords (String message, HashSet<String> dictionary) {
+        int numWords = 0;
+        message = message.toLowerCase();
+        String [] output = message.split("\\W+");
+        for (String i : output) {
+            //System.out.println(i);
+            if (dictionary.contains(i)) {
+                numWords++;
+            }
+        }
+        return numWords;
+    }
+    
+    public void testcountWords () {
+        FileResource fr = new FileResource();
+        String message = fr.asString();
+        fr = new FileResource("dictionaries/English.txt");
+        HashSet<String> dictionaries = ReadDictionary(fr);
+        //breakForLanguage(message,dictionaries);
+        //String message = "A sentence is the basic unit of language which expresses a complete thought. It does this by following the grammatical basic rules of syntax";
+        //FileResource fr = new FileResource();
+        int [] clé = tryKeyLength(message, 38 ,'e');
+        //int [] myList = clé;
+        VigenereCipher VCipher = new VigenereCipher(clé);
+        String réponse = VCipher.decrypt(message);
+        int nb = countWords(réponse, dictionaries);
+        System.out.println("nombre : "+nb);
+    }
+    
+    public void breakForLanguage(String encrypted, HashSet<String> dictionary) {
+        encrypted = encrypted.toString();
+        int [] clé = new int [100];
+        int highest = 0;
+        HashMap<Integer, int []> map = new HashMap<Integer, int []>();
+        for (int i = 1; i < 100; i++) {
+            clé = tryKeyLength(encrypted, i ,mostCommonCharIn(dictionary));
+            //System.out.println(Arrays.toString(clé));
+            VigenereCipher VCipher = new VigenereCipher(clé);
+            String réponse = VCipher.decrypt(encrypted);
+            int curr = countWords(réponse,dictionary);
+            //System.out.println("nb : "+curr+" clé "+Arrays.toString(clé));
+            //map.put(curr,Arrays.toString(clé));
+            map.put(curr,clé);
+            //int highest = 0;
+            if (curr > highest) {
+                highest = curr;
+                //System.out.println("nb élevé "+highest);
+            }
+            else {
+                highest = highest;
+                //System.out.println("nb élevé "+highest);
+                //System.out.println("test"+map.get(highest));
+            }
+        }
+        //System.out.println("nb élevé "+highest);
+        //System.out.println("test"+map.get(highest));
+        //System.out.println("Clés décryptant le plus de mot : "+Arrays.toString(map.get(highest)));
+        //
+        //System.out.println("Nb de ces clés :" +(map.get(highest)).length);
+        //System.out.println("Nb de mots décryptés dans dictio : "+highest);
+        VigenereCipher VCipher = new VigenereCipher(map.get(highest));
+        String réponse = VCipher.decrypt(encrypted);
+        System.out.println("Mon texte : "+réponse);
+    }
+    
+    public void testbreakForLanguage () {
+        FileResource fr = new FileResource();
+        String message = fr.asString();
+        fr = new FileResource("dictionaries/English.txt");
+        HashSet<String> dictionaries = ReadDictionary(fr);
+        breakForLanguage(message,dictionaries);
+    }
+    
+    public HashMap <String, HashSet<String>> dictionaries (DirectoryResource dr) {
+        HashMap <String, HashSet<String>> dictio = new  HashMap <String, HashSet<String>> ();
+        //DirectoryResource dr = new DirectoryResource();
+        for (File f : dr.selectedFiles()){
+            FileResource fr = new FileResource(f);
+            String name = f.getName();
+            System.out.println(name);
+            for (String i : fr.words()) {
+                String mot = i;
+                if (!dictio.containsKey(name)) {
+                    HashSet <String> wordstolanguage  = new HashSet <String>();
+                    wordstolanguage.add(mot);
+                    dictio.put(name,wordstolanguage);
+                }
+                else {
+                    dictio.get(name).add(mot);
+                }
+            }
+        }
+        return dictio;
+    }
+    
+    public void testdictionaries() {
+        //System.out.println(dictionaries());   
+    }
+    
+    public void breakForAllLangs (String encrypted, HashMap <String, HashSet<String>> languages, DirectoryResource dr) {
+        encrypted = encrypted.toString();
+        //DirectoryResource dr = new DirectoryResource();
+        languages = dictionaries(dr);
+        for (String i :  languages.keySet()) {
+            System.out.println("langage :"+i);
+            breakForLanguage(encrypted,languages.get(i)); 
+
+        }
+    }
+    
+    public void testbreakForAllLangs () {
+        FileResource fr = new FileResource("messages/secretmessage3.txt");
+        String message = fr.asString();
+        //System.out.println(message);
+        //fr = new FileResource("dictionaries/English.txt");
+        //HashSet<String> dictionaries = ReadDictionary(fr);
+        //HashMap <String, HashSet<String>> dictionaries = new HashMap <String, HashSet<String>> ();
+        DirectoryResource dr = new DirectoryResource();
+        HashMap <String, HashSet<String>> lang = dictionaries(dr);
+        breakForAllLangs(message,lang,dr);
+    }
+    //int[] tryKeyLength(String encrypted, int klength, char mostCommon)
+    
+    /*public void breakVigenere () {
+        //VigenereCipher VCipher = new VigenereCipher();
+        FileResource resource = new FileResource();
+        String message = resource.asString();
+        int [] clé = tryKeyLength(message, 4 ,'e');
+        //System.out.println(clé);
+        //System.out.println("clés sont : "+"\t"+Arrays.toString(clé));
+        int [] myList = clé;
+        VigenereCipher VCipher = new VigenereCipher(myList);
+        String réponse = VCipher.decrypt(message);
+        System.out.println("Mon texte : "+réponse);
+    }
+    */
+    
+    public void breakVigenere2 () {
+        //VigenereCipher VCipher = new VigenereCipher();
+        FileResource fr = new FileResource();
+        String message = fr.asString();
+        fr = new FileResource("dictionaries/English.txt");
+        HashSet<String> dictionaries = ReadDictionary(fr);
+        breakForLanguage(message,dictionaries);
+    }
+    
+    public void breakVigenerefinal () {
+        //VigenereCipher VCipher = new VigenereCipher();
+        FileResource resource = new FileResource("messages/secretmessage4.txt");
+        String message = resource.asString();
+        DirectoryResource dr = new DirectoryResource();
+        for (File f : dr.selectedFiles()){
+            FileResource fr = new FileResource(f);
+            HashMap <String, HashSet<String>> lang = dictionaries(dr);
+            breakForAllLangs(message,lang,dr);
+        }
+    }
+}
+//ArrayList maintains the insertion order i.e order of the object in which they are inserted. 
+//HashSet is an unordered collection and doesn't maintain any order. 
+//ArrayList allows duplicate values in its collection. On other hand duplicate elements are not allowed in Hashset.
